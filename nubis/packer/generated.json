@@ -156,7 +156,7 @@
       "instance_type": "m3.medium",
       "ssh_username": "ec2-user",
       "ssh_pty": "true",
-      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs amazon-linux ({{timestamp}}",
+      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs amazon-linux ({{timestamp}})",
       "ami_description": "{{user `project_description`}}",
       "ami_regions": [
         "us-east-1"
@@ -189,7 +189,7 @@
       "instance_type": "m3.medium",
       "ssh_username": "ubuntu",
       "ssh_pty": "true",
-      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs ubuntu",
+      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs ubuntu ({{timestamp}})",
       "ami_description": "{{user `project_description`}}",
       "ami_regions": [
         "us-east-1"
