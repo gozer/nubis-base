@@ -1,7 +1,7 @@
 {
   "push": {
-      "name": "{{user `atlas_build_username`}}/{{user `project_name`}}",
-      "vcs": false
+    "name": "{{user `atlas_build_username`}}/{{user `project_name`}}",
+    "vcs": false
   },
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
