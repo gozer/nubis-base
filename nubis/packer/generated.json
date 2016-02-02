@@ -1,0 +1,226 @@
+{
+  "push": {
+      "name": "{{user `atlas_build_username`}}/{{user `project_name`}}",
+      "vcs": false
+  },
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_KEY`}}",
+    "aws_account_id": "589768463761",
+    "aws_region": "us-west-2",
+    "aws_instance_s3_bucket": "nubis-amis",
+    "iam_instance_profile": "",
+    "automatic_version_bump": "1",
+    "automatic_version_verify": "1",
+    "project_description": "Nubis base AMI",
+    "project_name": "nubis-base",
+    "project_version": "1.276",
+    "source_ami_project_name": "base",
+    "atlas_build_id": "{{env `ATLAS_BUILD_ID`}}",
+    "atlas_build_number": "{{env `ATLAS_BUILD_NUMBER`}}",
+    "atlas_build_username": "{{env `ATLAS_BUILD_USERNAME`}}",
+    "atlas_build_configuration_version": "{{env `ATLAS_BUILD_CONFIGURATION_VERSION`}}",
+    "atlas_build_github_branch": "{{env `ATLAS_BUILD_GITHUB_BRANCH`}}",
+    "atlas_build_github_commit_sha": "{{env `ATLAS_BUILD_GITHUB_COMMIT_SHA`}}",
+    "atlas_build_github_tag": "{{env `ATLAS_BUILD_GITHUB_TAG`}}",
+    "aws_amazon_linux_ebs_ami": "ami-f0091d91",
+    "aws_amazon_linux_ebs_name": "amzn-ami-hvm-2015.09.1.x86_64-gp2",
+    "aws_amazon_linux_ebs_platform": "amazon-linux",
+    "aws_amazon_linux_ebs_rootdevicetype": "ebs",
+    "aws_ubuntu_ebs_ami": "ami-9abea4fb",
+    "aws_ubuntu_ebs_name": "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20160114.5",
+    "aws_ubuntu_ebs_platform": "ubuntu",
+    "aws_ubuntu_ebs_rootdevicetype": "ebs"
+  },
+  "post-processors": [
+    {
+      "type": "atlas",
+      "artifact": "nubisproject/{{user `project_name`}}",
+      "artifact_type": "amazon.image",
+      "metadata": {
+        "project_name": "{{user `project_name`}}",
+        "project_version": "{{user `project_version`}}",
+        "project_description": "{{user `project_description`}}",
+        "source_ami_project_name": "{{ user `source_ami_project_name` }}",
+        "build_name": "{{ build_name }}",
+        "build_type": "{{ build_type }}"
+      }
+    },
+    {
+      "type": "atlas",
+      "artifact": "{{user `atlas_build_username`}}/{{user `project_name`}}",
+      "artifact_type": "amazon.image",
+      "metadata": {
+        "atlas_build_id": "{{user `atlas_build_id`}}",
+        "atlas_build_number": "{{user `atlas_build_number`}}",
+        "atlas_build_username": "{{user `atlas_build_username`}}",
+        "atlas_build_configuration_version": "{{user `atlas_build_configuration_version`}}",
+        "atlas_build_github_branch": "{{user `atlas_build_github_branch`}}",
+        "atlas_build_github_commit_sha": "{{user `atlas_build_github_commit_sha`}}",
+        "atlas_build_github_tag": "{{user `atlas_build_github_tag`}}",
+        "project_name": "{{user `project_name`}}",
+        "project_version": "{{user `project_version`}}",
+        "project_description": "{{user `project_description`}}",
+        "source_ami_project_name": "{{ user `source_ami_project_name` }}",
+        "build_name": "{{ build_name }}",
+        "build_type": "{{ build_type }}"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell-local",
+      "command": "which  librarian-puppet 2>/dev/null 1>/dev/null || sudo apt-get install -y ruby-dev"
+    },
+    {
+      "type": "shell-local",
+      "command": "which  librarian-puppet 2>/dev/null 1>/dev/null || ( sudo gem install librarian-puppet -v 2.2.1 && sudo gem install puppet )"
+    },
+    {
+      "type": "shell-local",
+      "command": "test -r nubis/Puppetfile && ( cd nubis && librarian-puppet install --path librarian-puppet/etc/puppet/modules --verbose )"
+    },
+    {
+      "type": "shell-local",
+      "command": "test -d nubis/librarian-puppet/etc/puppet/modules && tar -C nubis/librarian-puppet --exclude='.git' -zpcf nubis/librarian-puppet.tar.gz ."
+    },
+    {
+      "type": "shell",
+      "inline": "echo {{user `project_name`}} {{user `project_version`}} | sudo tee -a /etc/{{user `project_name`}}-release"
+    },
+    {
+      "type": "file",
+      "source": "nubis/librarian-puppet.tar.gz",
+      "destination": "/tmp/librarian-puppet.tar.gz"
+    },
+    {
+      "type": "shell",
+      "inline": "sleep 30"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo tar --directory / --gunzip --extract --overwrite --file /tmp/librarian-puppet.tar.gz",
+        "rm -f /tmp/librarian-puppet.tar.gz"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "nubis/bin/packer-bootstrap"
+    },
+    {
+      "type": "file",
+      "source": "nubis/puppet/files/",
+      "destination": "/etc/nubis/puppet/files"
+    },
+    {
+      "type": "puppet-masterless",
+      "manifest_dir": "nubis/puppet",
+      "manifest_file": "nubis/puppet",
+      "execute_command": "{{.FacterVars}} {{if .Sudo}} sudo -E {{end}} puppet apply --verbose --modulepath='/etc/puppet/modules/' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} --detailed-exitcodes {{.ManifestDir}}",
+      "facter": {
+        "project_name": "{{user `project_name`}}",
+        "project_version": "{{user `project_version`}}"
+      }
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir /etc/mig",
+        "mkdir /tmp/confd"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "nubis/files/confd/",
+      "destination": "/tmp/confd"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo mv /tmp/confd/*.toml /etc/confd/conf.d/",
+        "sudo mv /tmp/confd/*.tmpl /etc/confd/templates/"
+      ]
+    },
+    {
+      "type": "puppet-masterless",
+      "manifest_file": "nubis/puppet/dnsmasq.pp",
+      "execute_command": "{{.FacterVars}} {{if .Sudo}} sudo -E {{end}} puppet apply --verbose --modulepath='/etc/puppet/modules/' {{if ne .HieraConfigPath \"\"}}--hiera_config='{{.HieraConfigPath}}' {{end}} {{if ne .ManifestDir \"\"}}--manifestdir='{{.ManifestDir}}' {{end}} --detailed-exitcodes {{.ManifestFile}}",
+      "facter": {
+        "project_name": "{{user `project_name`}}",
+        "project_version": "{{user `project_version`}}"
+      }
+    },
+    {
+      "type": "shell",
+      "inline": "test -x /usr/local/bin/nubis-housekeeper && /usr/local/bin/nubis-housekeeper || true"
+    }
+  ],
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "name": "amazon-ebs-amazon-linux",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `aws_amazon_linux_ebs_ami`}}",
+      "instance_type": "m3.medium",
+      "ssh_username": "ec2-user",
+      "ssh_pty": "true",
+      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs amazon-linux ({{timestamp}}",
+      "ami_description": "{{user `project_description`}}",
+      "ami_regions": [
+        "us-east-1"
+      ],
+      "ami_groups": "all",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/xvda",
+          "volume_type": "gp2",
+          "delete_on_termination": true,
+          "volume_size": "8"
+        }
+      ],
+      "tags": {
+        "project": "{{user `project_name`}}",
+        "version": "{{user `project_version`}}",
+        "platform": "amazon-linux",
+        "parent_source_ami": "{{user `aws_amazon_linux_ebs_ami`}}"
+      },
+      "user_data": "I2Nsb3VkLWNvbmZpZwpyZXBvX3VwZ3JhZGU6IG5vbmUK"
+    },
+    {
+      "type": "amazon-ebs",
+      "name": "amazon-ebs-ubuntu",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "iam_instance_profile": "{{user `iam_instance_profile`}}",
+      "region": "{{user `aws_region`}}",
+      "source_ami": "{{user `aws_ubuntu_ebs_ami`}}",
+      "instance_type": "m3.medium",
+      "ssh_username": "ubuntu",
+      "ssh_pty": "true",
+      "ami_name": "{{user `project_name`}} {{user `project_version`}} ebs ubuntu",
+      "ami_description": "{{user `project_description`}}",
+      "ami_regions": [
+        "us-east-1"
+      ],
+      "ami_groups": "all",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_type": "gp2",
+          "delete_on_termination": true,
+          "volume_size": "8"
+        }
+      ],
+      "tags": {
+        "project": "{{user `project_name`}}",
+        "version": "{{user `project_version`}}",
+        "platform": "ubuntu",
+        "parent_source_ami": "{{user `aws_ubuntu_ebs_ami`}}"
+      }
+    }
+  ]
+}
