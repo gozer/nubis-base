@@ -70,19 +70,7 @@
   "provisioners": [
     {
       "type": "shell-local",
-      "command": "which  librarian-puppet 2>/dev/null 1>/dev/null || sudo apt-get install -y ruby-dev"
-    },
-    {
-      "type": "shell-local",
-      "command": "which  librarian-puppet 2>/dev/null 1>/dev/null || ( sudo gem install librarian-puppet -v 2.2.1 && sudo gem install puppet )"
-    },
-    {
-      "type": "shell-local",
-      "command": "test -r nubis/Puppetfile && ( cd nubis && librarian-puppet install --path librarian-puppet/etc/puppet/modules --verbose )"
-    },
-    {
-      "type": "shell-local",
-      "command": "test -d nubis/librarian-puppet/etc/puppet/modules && tar -C nubis/librarian-puppet --exclude='.git' -zpcf nubis/librarian-puppet.tar.gz ."
+      "command": "bash -x nubis/packer/generated.sh"
     },
     {
       "type": "shell",
