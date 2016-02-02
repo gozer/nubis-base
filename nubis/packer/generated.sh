@@ -2,6 +2,13 @@
 
 set -x
 
+# Probe Packer build environment
+env
+facter
+dpkg -l
+
+echo "XXX: MARK"
+
 which  librarian-puppet 2>/dev/null 1>/dev/null || sudo apt-get install -y ruby-dev
 which  librarian-puppet 2>/dev/null 1>/dev/null || ( sudo gem install librarian-puppet -v 2.2.1 && sudo gem install puppet )
 test -r nubis/Puppetfile && ( cd nubis && librarian-puppet install --path librarian-puppet/etc/puppet/modules --verbose )
