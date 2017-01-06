@@ -43,8 +43,14 @@ if [ "$BUNDLE_GEMFILE" == "" ]; then
 fi
 
 # Let's find librarian-puppet, m'kay?
-bundle exec librarian-puppet --version
-bundle exec env | grep PATH
+bundle exec librarian-puppet version
+bundle exec env | grep -v AWS
+
+LP=$(find $HOME -name librarian-puppet)
+
+echo $LP
+
+$LP version
 
 #nubis-builder build
 
