@@ -7,7 +7,7 @@ AWSCLI_VERSION="1.11.36"
 
 if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
   echo "Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY"
-  exit 0
+  exit 1
 fi
 
 if [ "$BUNDLE_GEMFILE" == "" ]; then
@@ -31,9 +31,13 @@ if [ ! -d "$HOME/nubis-builder" ]; then
   git clone https://github.com/nubisproject/nubis-builder.git "$HOME/nubis-builder"
 fi
 
-( cd "$HOME/nubis-builder" && ( git pull && git fetch --tags && git checkout "$NUBIS_BUILDER_VERSION" ) )
+if [ "$(git -C "$HOME/nubis-builder" describe)" != "$NUBIS_BUILDER_VERSION" ]; then
+  git -C "$HOME/nubis-builder" pull master
+  git -C "$HOME/nubis-builder" fetch --tags
+  git -C "$HOME/nubis-builder" checkout "$NUBIS_BUILDER_VERSION"
+fi
 
-cat <<"EOF" > "$HOME/nubis-builder/secrets/variables.json"
+cat <<EOF > "$HOME/nubis-builder/secrets/variables.json"
 {
   "variables": {
     "aws_region": "${AWS_REGION:-us-west-2}",
@@ -43,7 +47,7 @@ cat <<"EOF" > "$HOME/nubis-builder/secrets/variables.json"
 EOF
 
 aws --version
-packer --versiona
+packer --version
 nubis-builder --version
 
 #Kick the build
