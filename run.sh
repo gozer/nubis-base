@@ -19,14 +19,11 @@ fi
 
 packer --version
 
-#XXX: cleanup temporarly
-rm -rf nubis-builder
-
-if [ ! -d nubis-builder ]; then
-  git clone https://github.com/nubisproject/nubis-builder.git nubis-builder
+if [ ! -d "$HOME/nubis-builder" ]; then
+  git clone https://github.com/nubisproject/nubis-builder.git "$HOME/nubis-builder"
 fi
 
-cd nubis-builder && ( git pull && git fetch --tags && git checkout v1.3.0 )
+cd "$HOME/nubis-builder" && ( git pull && git fetch --tags && git checkout v1.3.0 && pwd )
 
 nubis-builder --version
 
