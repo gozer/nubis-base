@@ -13,8 +13,8 @@ aws s3 ls
 PACKER_V=$(packer --version 2>/dev/null)
 
 if [ "$PACKER_V" != "$PACKER_VERSION" ]; then
-  wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/$PACKER_VERSION/packer_$PACKER_VERSION_linux_amd64.zip
-  cd $HOME/bin && unzip /tmp/packer.zip
+  wget -O /tmp/packer.zip "https://releases.hashicorp.com/packer/$PACKER_VERSION/packer_${PACKER_VERSION}_linux_amd64.zip"
+  cd "$HOME/bin" && unzip /tmp/packer.zip
 fi
 
 packer --version
