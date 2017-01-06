@@ -4,7 +4,7 @@ PACKER_VERSION="0.12.1"
 
 set -x
 
-pip install --user awscli
+pip install --user awscli==1.11.36
 
 export PATH=$PATH:$HOME/.local/bin:$HOME/nubis-builder/bin
 
@@ -19,8 +19,11 @@ fi
 
 packer --version
 
+#XXX: cleanup temporarly
+rm -rf nubis-builder
+
 if [ ! -d nubis-builder ]; then
-  git clone https://github.com/nubisproject/nubis-builder nubis-builder
+  git clone https://github.com/nubisproject/nubis-builder.git nubis-builder
 fi
 
 cd nubis-builder && ( git pull && git fetch --tags && git checkout v1.3.0 )
