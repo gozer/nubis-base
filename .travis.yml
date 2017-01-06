@@ -5,6 +5,7 @@ cache:
   bundler: true
   directories:
   - "${HOME}/bin"
+  - "${HOME}/.local"
   - nubis/librarian-puppet
   - nubis-builder
 addons:

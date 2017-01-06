@@ -1,17 +1,19 @@
 #!/bin/bash
 
+PACKER_VERSION="0.12.1"
+
 set -x
 
 pip install --user awscli
 
-export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/.local/bin:$HOME/nubis-builder/bin
 
 aws s3 ls
 
 PACKER_V=$(packer --version 2>/dev/null)
 
-if [ "$PACKER_V" != "0.12.1" ]; then
-  wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/0.12.1/packer_0.12.1_linux_amd64.zip
+if [ "$PACKER_V" != "$PACKER_VERSION" ]; then
+  wget -O /tmp/packer.zip https://releases.hashicorp.com/packer/$PACKER_VERSION/packer_$PACKER_VERSION_linux_amd64.zip
   cd $HOME/bin && unzip /tmp/packer.zip
 fi
 
@@ -21,6 +23,10 @@ if [ ! -d nubis-builder ]; then
   git clone https://github.com/nubisproject/nubis-builder nubis-builder
 fi
 
-cd nubis-builder && ( git pull --tags && git checkout v1.3.0 )
+cd nubis-builder && ( git pull && git fetch --tags && git checkout v1.3.0 )
+
+nubis-builder --version
+
+nubis-builder build
 
 exit 0
