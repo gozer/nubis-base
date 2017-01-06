@@ -14,6 +14,7 @@ addons:
     - shellcheck
 script:
 - nubis/travis/run-checks
+- env
 notifications:
   slack:
     secure: m0UqU6EjiDFKzGSvKlndym1mdB9XeDEYQa3pKW9teJcogF2GR6za6IsvntIoQEAyBBSgJI+BTeBbZawMj4aYp0KzPDrCH9DfhP85tgBUcqAhRNdNiTQmqnSKXJe763YImk4rUJlEgtHwWu5sQGA4W2hym4srsbliN/7bK0KsDzc=
