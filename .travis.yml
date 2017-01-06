@@ -6,6 +6,7 @@ cache:
   directories:
   - "${HOME}/bin"
   - nubis/librarian-puppet
+  - nubis-builder
 addons:
   apt:
     sources:

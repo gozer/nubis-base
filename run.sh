@@ -16,3 +16,11 @@ if [ "$PACKER_V" != "0.12.1" ]; then
 fi
 
 packer --version
+
+if [ ! -d nubis-builder ]; then
+  git clone https://github.com/nubisproject/nubis-builder nubis-builder
+fi
+
+cd nubis-builder && ( git pull --tags && git checkout v1.3.0 )
+
+exit 0
