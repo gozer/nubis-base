@@ -15,8 +15,7 @@ fi
 
 packer --version
 
-# XXX: Cleanup error
-rm -rf nubis-builder
+gem install -V librarian-puppet -v 1.5.0
 
 if [ ! -d "$HOME/nubis-builder" ]; then
   git clone https://github.com/nubisproject/nubis-builder.git "$HOME/nubis-builder"
