@@ -23,7 +23,7 @@ if [ ! -d "$HOME/nubis-builder" ]; then
   git clone https://github.com/nubisproject/nubis-builder.git "$HOME/nubis-builder"
 fi
 
-cd "$HOME/nubis-builder" && ( git pull && git fetch --tags && git checkout v1.3.0 && pwd )
+( cd "$HOME/nubis-builder" && ( git pull && git fetch --tags && git checkout v1.3.0 ) )
 
 nubis-builder --version
 
