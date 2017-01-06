@@ -14,7 +14,6 @@ addons:
     - shellcheck
 script:
 - nubis/travis/run-checks
-- env
 - ./run.sh
 notifications:
   slack:
