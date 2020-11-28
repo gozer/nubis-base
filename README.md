@@ -3,6 +3,7 @@
 [![Version](https://img.shields.io/github/release/nubisproject/nubis-base.svg?maxAge=2592000)](https://github.com/nubisproject/nubis-base/releases)
 [![Build Status](https://img.shields.io/travis/nubisproject/nubis-base/master.svg?maxAge=2592000)](https://travis-ci.org/nubisproject/nubis-base)
 [![Issues](https://img.shields.io/github/issues/nubisproject/nubis-base.svg?maxAge=2592000)](https://github.com/nubisproject/nubis-base/issues)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgozer%2Fnubis-base.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgozer%2Fnubis-base?ref=badge_shield)
 
 ## Quick start
 
@@ -33,3 +34,7 @@ provisioners, etc.
 ### `nubis/terraform`
 
 Terraform deployment templates.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgozer%2Fnubis-base.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgozer%2Fnubis-base?ref=badge_large)
